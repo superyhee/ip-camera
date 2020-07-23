@@ -24,7 +24,7 @@ exports.handler = async(event, context, callback) => {
                     console.log(record.eventName + ":" + deviceUUID);
                     console.log('Run task with deviceURL:' + deviceURL + "  DeviceUUID:" + deviceUUID);
                     //run ecs task
-                    await ECS.runTask(getEC2Params(userName + ':' + passwd + '@' + deviceURL, deviceUUID, buckerName, segmentTime)).promise().then(function(data) {
+                    await ECS.runTask(getFargateParams(userName + ':' + passwd + '@' + deviceURL, deviceUUID, buckerName, segmentTime)).promise().then(function(data) {
                         var item = new Object();
                         item.deviceUUID = deviceUUID;
                         item.deviceURL = deviceURL;
