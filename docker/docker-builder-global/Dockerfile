@@ -13,6 +13,9 @@ RUN apk add --no-cache bash
 RUN apk add  --no-cache aws-cli
 RUN apk add --no-cache inotify-tools
 RUN apk add --no-cache ffmpeg
+RUN apk add --no-cache tzdata \
+&& ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \ 
+&& echo "Asia/Shanghai" > /etc/timezone
 
 
 # Create virtual environment

@@ -32,29 +32,30 @@ exports.handler = async(event, context, callback) => {
                         //save task info into dynamodb
                         return saveItem(item).then(response => {
                             console.log("success saveItem into dynamodb" + response);
-                            sendResponse(200, item.deviceUUID, callback);
+                            //   sendResponse(200, item.deviceUUID, callback);
                         }, (reject) => {
-                            sendResponse(400, reject, callback);
+                            console.log("---db error---" + reject)
+                            //  sendResponse(400, reject, callback);
                         });
                     }).catch(function(error) {
-                        console.log(error);
+                        console.log("---task error---" + error);
                     });
                 }
                 if (record.eventName == "REMOVE") {
-                     deviceURL = record.dynamodb.OldImage.mediaURL.S; //get media url 
-                     deviceUUID = record.dynamodb.OldImage.deviceUUID.S + "-" + record.dynamodb.OldImage.channel.S; //join device id with channel
+                    deviceURL = record.dynamodb.OldImage.mediaURL.S; //get media url 
+                    deviceUUID = record.dynamodb.OldImage.deviceUUID.S + "-" + record.dynamodb.OldImage.channel.S; //join device id with channel
                     console.log(record.eventName + ":" + deviceUUID);
                     await getItem(deviceUUID, callback).then(function(item) {
-                      if (typeof(item) != 'undefined') {   
-                        console.log("stop task with:" + JSON.stringify(item));
-                        var params = {
-                            task: item.taksARN,
-                            cluster: process.env.ECS_CLUSTER_NAME,
-                            reason: 'stop recording'
-                        };
-                        return ECS.stopTask(params).promise();
-                    }}
-                    ).then(function(data) {
+                        if (typeof(item) != 'undefined') {
+                            console.log("stop task with:" + JSON.stringify(item));
+                            var params = {
+                                task: item.taksARN,
+                                cluster: process.env.ECS_CLUSTER_NAME,
+                                reason: 'stop recording'
+                            };
+                            return ECS.stopTask(params).promise();
+                        }
+                    }).then(function(data) {
                         return deleteItem(deviceUUID);
                     }).catch(function(error, data) {
                         if (error)
@@ -65,6 +66,7 @@ exports.handler = async(event, context, callback) => {
             }
         }
         catch (error) {
+            console.log("---task error---" + error);
             return reject(error);
         }
 
